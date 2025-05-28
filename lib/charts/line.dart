@@ -7,7 +7,7 @@ class line extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 350,
+      height: 300,
       width: 350,
       child: LineChart(
         LineChartData(

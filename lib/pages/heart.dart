@@ -1,17 +1,25 @@
-import 'package:flutter/material.dart';
-import 'package:fl_chart/fl_chart.dart';
-import 'package:health/charts/line.dart';
+import 'dart:math';
 
-class heart extends StatelessWidget {
+import 'package:flutter/material.dart';
+
+import 'package:health/charts/line.dart';
+import 'package:health/bar/drawer.dart';
+final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+class heart extends StatefulWidget {
   const heart({super.key});
 
   @override
+  _HeartPageState createState() => _HeartPageState();
+}
+class _HeartPageState extends State<heart> {
+  DateTime _lastUpdated = DateTime.now(); // Lưu trữ thời gian cập nhật
+  int heart_value =1;
   Widget build(BuildContext context) {
     final backgroundColor = Color(0xFFFDF4FF); // màu nền app
-
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: backgroundColor,
-
+      endDrawer: CustomDrawer(),
       appBar: AppBar(
         title: Row(
           mainAxisAlignment: MainAxisAlignment.start, // Căn giữa icon và text
@@ -25,8 +33,20 @@ class heart extends StatelessWidget {
         elevation: 0,
         foregroundColor: Colors.black,
         actions: [
-          Icon(Icons.account_circle_rounded),
-          Icon(Icons.more_vert),
+          IconButton(onPressed: (){
+            setState(() {
+              // Cập nhật lại các giá trị cần làm mới
+              _lastUpdated = DateTime.now(); // Cập nhật lại thời gian
+              heart_value =Random().nextInt(41) + 60; // Cập nhật lại nhịp tim giả lập
+            });
+          }
+              ,  icon: const Icon(Icons.refresh)),
+          IconButton(
+            icon: const Icon(Icons.account_circle),
+            onPressed: () {
+              _scaffoldKey.currentState!.openEndDrawer();}, // Mở drawer
+            ),
+
         ],
       ),
       body: Align(
@@ -42,8 +62,9 @@ class heart extends StatelessWidget {
                 children: [
                   Text("Last Measured result",
                     style: TextStyle(fontSize: 20 ,fontWeight: FontWeight.bold),),
-                  Text("74 bpm",
+                  Text("$heart_value bpm",
                   style: TextStyle(fontSize: 20 ,fontWeight: FontWeight.bold),),
+
                   Text("Date : 15/10/2025",
                     style: TextStyle(fontSize: 18 ,fontWeight: FontWeight.bold),),
                 ],
@@ -63,10 +84,10 @@ class heart extends StatelessWidget {
             // Biểu đồ trực tiếp không container
             const line(),
             SizedBox(height: 32),
-            Text("Last updated: ${DateTime.now()}"),
+            Text("Last updated: ${_lastUpdated.toString()}"),
             Container(
               margin: EdgeInsets.symmetric(horizontal: 24),
-              padding: EdgeInsets.all(16),
+              padding: EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: Colors.red[50],
                 borderRadius: BorderRadius.circular(12),

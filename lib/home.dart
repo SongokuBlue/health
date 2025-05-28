@@ -4,7 +4,8 @@ import 'package:health/pages/heart.dart';
 import 'package:health/pages/oxygen.dart';
 import 'package:health/pages/step.dart';
 import 'package:health/pages/stress.dart';
-
+import 'package:health/bar/drawer.dart';
+final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
@@ -12,6 +13,8 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final double boxSize = 125; //chỉnh cho tất cả box
     return Scaffold(
+      key: _scaffoldKey,
+      endDrawer: CustomDrawer(),
       backgroundColor: Colors.white,
       appBar: AppBar(
         leading: Container(
@@ -32,6 +35,15 @@ class HomePage extends StatelessWidget {
             ),
           ),
         ),
+          actions: [
+
+            IconButton(
+              icon: const Icon(Icons.account_circle),
+              onPressed: () {
+                _scaffoldKey.currentState!.openEndDrawer();}, // Mở drawer
+            ),
+
+          ]
       ),
 
       // box chosen
@@ -46,12 +58,12 @@ class HomePage extends StatelessWidget {
               children: [
                 Text(
                   'Welcome to Health Care!',
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: 4),
                 Text(
                   'How are you feeling today?',
-                  style: TextStyle(fontSize: 16, color: Colors.black54),
+                  style: TextStyle(fontSize: 20, color: Colors.black54),
                 ),
               ],
             ),
@@ -88,7 +100,7 @@ class HomePage extends StatelessWidget {
                 children: [
                   Text(
                     "SPO2",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   Text(
                     "Check your oxygen level",
@@ -132,7 +144,7 @@ class HomePage extends StatelessWidget {
                 children: [
                   Text(
                     "Heart Rate",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   Text(
                     "Measure your heart beat",
@@ -180,7 +192,7 @@ class HomePage extends StatelessWidget {
                 children: [
                   Text(
                     "Steps",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   Text(
                     "Count your daily steps",
@@ -221,7 +233,7 @@ class HomePage extends StatelessWidget {
                 children: [
                   Text(
                     "Stress",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   Text(
                     "Watching your stress level",
