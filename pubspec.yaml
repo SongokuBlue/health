@@ -57,7 +57,7 @@ flutter:
 
   assets:
       - assets/left-arrow.svg            # <‑‑ 2 dấu cách trước “-”
-  #   - images/a_dot_ham.jpeg
+      - assets/heart.svg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
