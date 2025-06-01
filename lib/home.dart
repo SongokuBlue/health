@@ -17,24 +17,7 @@ class HomePage extends StatelessWidget {
       endDrawer: CustomDrawer(),
       backgroundColor: Colors.white,
       appBar: AppBar(
-        leading: Container(
-          margin: const EdgeInsets.all(10),
-          height: 20,
-          width: 30,
-          decoration: BoxDecoration(
-            color: Colors.red,
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: SvgPicture.asset(
-            'assets/left-arrow.svg',
-            fit: BoxFit.contain,
-            // tuỳ chọn đổi màu icon nếu SVG chưa gán màu:
-            colorFilter: const ColorFilter.mode(
-              Colors.white60,
-              BlendMode.srcIn,
-            ),
-          ),
-        ),
+
           actions: [
 
             IconButton(

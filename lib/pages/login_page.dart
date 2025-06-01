@@ -46,19 +46,8 @@ class LoginPage extends StatelessWidget {
                 controller: passwordController,
               ), //password
               const SizedBox(height: 10),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 25),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Text(
-                      'Forgot Password?',
-                      style: TextStyle(color: Colors.blue),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 10),
+
+
               //log in button
               Container(
                 padding: EdgeInsets.all(15),
