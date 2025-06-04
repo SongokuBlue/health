@@ -2,8 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:health/home.dart';
 import 'package:health/pages/login_page.dart';
 import 'package:flutter/services.dart';
-void main() {
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // phải khởi tạo trc
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   // Cấm xoay ngang, chỉ cho phép xoay dọc
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,

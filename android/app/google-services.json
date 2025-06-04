@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "347819806364",
+    "firebase_url": "https://testing-23280-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "testing-23280",
+    "storage_bucket": "testing-23280.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:347819806364:android:53f045421ecbd73bfba759",
+        "android_client_info": {
+          "package_name": "com.example.health"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB7O6Oknhy4ZmbeCg2FXI-CnpImfAEvF5g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
