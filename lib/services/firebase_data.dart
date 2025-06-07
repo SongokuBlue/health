@@ -22,21 +22,21 @@ class HealthLog {
       oxygenSaturation: (json['oxygenSaturation'] ?? 0).toDouble(),
       stepCount: json['stepCount'] ?? 0,
       timestamp: DateTime.parse(json['timestamp'] ?? ""), //change to date time
-    );
+    ); //json tiêu chuẩn của data
   }
 }
 
 class FirebaseService {
   final DatabaseReference _dbRef =
-  FirebaseDatabase.instance.ref("healthRecords/logs");
+  FirebaseDatabase.instance.ref("healthRecords/logs"); //take the database ref and data
 
   Future<List<HealthLog>> fetchHealthLogs() async {
     final snapshot = await _dbRef.get();
     if (snapshot.exists) {
-      final Map<dynamic, dynamic> data = snapshot.value as Map<dynamic, dynamic>;
-      return data.values
+      final Map<dynamic, dynamic> data = snapshot.value as Map<dynamic, dynamic>; //dynamic là chơi bất kì kiểu nào.
+      return data.values //all data except key
           .map((entry) => HealthLog.fromJson(entry))
-          .toList();
+          .toList(); //chuyển hóa thành dữ liệu dc lưu
     } else {
       return [];
     }

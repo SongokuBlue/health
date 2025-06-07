@@ -26,7 +26,8 @@ class LineChartWidget extends StatelessWidget {
           maxY: 200,
           gridData: FlGridData(
             show: true,
-            drawVerticalLine: false, // bỏ grid dọc để đỡ rối
+            drawVerticalLine: true, // bỏ grid dọc để đỡ rối
+            verticalInterval: 5,
             drawHorizontalLine: true,
             getDrawingHorizontalLine: (value) {
               return FlLine(
