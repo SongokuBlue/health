@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:health/pages/login_page.dart';
 class CustomDrawer extends StatelessWidget {
   const CustomDrawer({super.key});
 
@@ -26,7 +26,10 @@ class CustomDrawer extends StatelessWidget {
             onTap: () {
               // Update the state of the app.
               // ...
-              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => LoginPage()),
+              );
             },
           ),
         ],
