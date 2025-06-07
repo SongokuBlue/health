@@ -102,7 +102,7 @@ class HomePage extends StatelessWidget {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => heart()),
+                    MaterialPageRoute(builder: (context) => HeartPage()),
                   ); // on tap
                 },
                 child: Container(
@@ -188,45 +188,45 @@ class HomePage extends StatelessWidget {
           ),
 
           // Block 4 - Stress
-          Row(
-            children: [
-              InkWell(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => stress()),
-                  ); // on tap
-                },
-                child: Container(
-                  height: boxSize,
-                  width: boxSize,
-                  decoration: BoxDecoration(
-                    color: Colors.deepPurpleAccent,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Icon(
-                    Icons.monitor_heart,
-                    size: 40,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-              SizedBox(width: 16),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Stress",
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    "Watching your stress level",
-                    style: TextStyle(color: Colors.black54),
-                  ),
-                ],
-              ),
-            ],
-          ),
+          // Row(
+          //   children: [
+          //     InkWell(
+          //       onTap: () {
+          //         Navigator.push(
+          //           context,
+          //           MaterialPageRoute(builder: (context) => stress()),
+          //         ); // on tap
+          //       },
+          //       child: Container(
+          //         height: boxSize,
+          //         width: boxSize,
+          //         decoration: BoxDecoration(
+          //           color: Colors.deepPurpleAccent,
+          //           borderRadius: BorderRadius.circular(20),
+          //         ),
+          //         child: Icon(
+          //           Icons.monitor_heart,
+          //           size: 40,
+          //           color: Colors.white,
+          //         ),
+          //       ),
+          //     ),
+          //     SizedBox(width: 16),
+          //     Column(
+          //       crossAxisAlignment: CrossAxisAlignment.start,
+          //       children: [
+          //         Text(
+          //           "Stress",
+          //           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          //         ),
+          //         Text(
+          //           "Watching your stress level",
+          //           style: TextStyle(color: Colors.black54),
+          //         ),
+          //       ],
+          //     ),
+          //   ],
+          // ),
         ],
       ),
     );

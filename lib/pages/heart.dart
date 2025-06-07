@@ -1,53 +1,54 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+
 import 'package:health/charts/line.dart';
 import 'package:health/bar/drawer.dart';
+import 'package:health/services/firebase_data.dart';
 final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-class heart extends StatefulWidget {
-  const heart({super.key});
+class HeartPage extends StatefulWidget {
+  const HeartPage({super.key});
 
   @override
   _HeartPageState createState() => _HeartPageState();
 }
-class _HeartPageState extends State<heart> {
 
+class _HeartPageState extends State<HeartPage> {
   DateTime _lastUpdated = DateTime.now(); // Lưu trữ thời gian cập nhật
-
   String selectedFilter = ""; // Mặc định
-  double heart_value = 0;
   List<DateTime> filterdates = [];
-  List<DateTime> dates = [
-    DateTime(2025, 5, 26),
-    DateTime(2025, 5, 27),
-    DateTime(2025, 5, 28),
-    DateTime(2025, 5, 29),
-    DateTime(2025, 5, 30),
-    DateTime(2025, 5, 31),
-  ];
-
-  List<double> values = [75, 78, 72, 80, 98, 92];
-
+  List<HealthLog> logs = []; // Danh sách lưu trữ logs từ Firebase
   List<FlSpot> spots = [];
 
   @override
   void initState() {
     super.initState();
-    _updateSpots();
-    heart_value = values.last;
-    filterdates = [...dates];
+    _loadData();
   }
 
+  // Load dữ liệu từ Firebase
+  void _loadData() async {
+    FirebaseService service = FirebaseService();
+    final data = await service.getAveragedPerMinuteLogs();
+    print("Fetched data: $data");  // Kiểm tra xem dữ liệu có được lấy không
+    setState(() {
+      logs = data;
+      _updateSpots();
+      filterdates = data.map((log) => log.timestamp).toList();
+    });
+  }
+
+  // Cập nhật spots cho biểu đồ từ dữ liệu logs
   void _updateSpots() {
     spots = List.generate(
-      values.length,
-          (index) => FlSpot(index.toDouble(), values[index]),
+      logs.length,
+          (index) => FlSpot(index.toDouble(), logs[index].heartRate),
     );
   }
 
+  @override
   Widget build(BuildContext context) {
-    final backgroundColor = Color(0xFFFDF4FF); // màu nền app
+    final backgroundColor = Color(0xFFFDF4FF); // Màu nền app
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: backgroundColor,
@@ -56,7 +57,7 @@ class _HeartPageState extends State<heart> {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.start, // Căn giữa icon và text
           children: [
-            Text("heart", style: TextStyle(fontWeight: FontWeight.bold)),
+            Text("Heart", style: TextStyle(fontWeight: FontWeight.bold)),
             Icon(Icons.favorite, color: Colors.red), // Icon trái tim
             SizedBox(width: 8), // Khoảng cách giữa icon và text
           ],
@@ -65,29 +66,21 @@ class _HeartPageState extends State<heart> {
         elevation: 0,
         foregroundColor: Colors.black,
         actions: [
-          IconButton(onPressed: () {
-            setState(() {
-              final now = dates.last.add(Duration(days: 1)); // Ngày tiếp theo
-              final newValue = 70 +
-                  Random().nextInt(40); // Nhịp tim ngẫu nhiên 70–109
-
-              dates.add(now);
-              values.add(newValue.toDouble()); //cập nhật thử list data
-              // Cập nhật lại các giá trị cần làm mới
-              _lastUpdated = DateTime.now(); // Cập nhật lại thời gian
-              heart_value = values[values.length - 1]; // Cập nhật lại nhịp tim giả lập
-              filterdates = [...dates];
-              _updateSpots();
-            });
-          }
-              , icon: const Icon(Icons.refresh)),
+          IconButton(
+            onPressed: () {
+              setState(() {
+                _loadData(); // Tải lại dữ liệu từ Firebase khi nhấn refresh
+                _lastUpdated = DateTime.now(); // Cập nhật lại thời gian
+              });
+            },
+            icon: const Icon(Icons.refresh),
+          ),
           IconButton(
             icon: const Icon(Icons.account_circle),
             onPressed: () {
-              _scaffoldKey.currentState!.openEndDrawer();
-            }, // Mở drawer
+              _scaffoldKey.currentState!.openEndDrawer(); // Mở drawer
+            },
           ),
-
         ],
       ),
       body: Align(
@@ -102,15 +95,11 @@ class _HeartPageState extends State<heart> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text("Last Measured result",
-                    style: TextStyle(
-                        fontSize: 20, fontWeight: FontWeight.bold),),
-                  Text("${heart_value.toStringAsFixed(1)} bpm",
-                    style: TextStyle(
-                        fontSize: 20, fontWeight: FontWeight.bold),),
-
-                  Text("Date : ${_formatDate(dates.last)}",
-                    style: TextStyle(
-                        fontSize: 18, fontWeight: FontWeight.bold),),
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                  Text("${logs.isNotEmpty ? logs.last.heartRate.toStringAsFixed(1) : '0.0'} bpm",
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                  Text("Date: ${logs.isNotEmpty ? _formatDate(logs.last.timestamp) : 'N/A'}",
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 ],
               ),
             ),
@@ -120,14 +109,14 @@ class _HeartPageState extends State<heart> {
               children: [
                 _buildFilterButton("Days"),
                 _buildFilterButton("Week"),
-                _buildFilterButton("Months"),
-                _buildFilterButton("Years"),
+                _buildFilterButton("1Hour"),
+                _buildFilterButton("2Hours"),
               ],
             ),
             SizedBox(height: 32),
             // Biểu đồ trực tiếp không container
             LineChartWidget(
-              dates: filterdates, spots: spots, chartColor: Colors.red,),
+                dates: filterdates, spots: spots, chartColor: Colors.red),
             SizedBox(height: 32),
             Text("Last updated: ${_lastUpdated.toString()}"),
             Container(
@@ -194,8 +183,8 @@ class _HeartPageState extends State<heart> {
       if (selectedFilter == filter) {
         // Nếu đang chọn filter đó => bấm lại lần nữa sẽ hủy chọn
         selectedFilter = ""; // hoặc "All"
-        filterdates = [...dates];
-        _updateSpots(); // cập nhật lại spots từ toàn bộ values
+        filterdates = logs.map((log) => log.timestamp).toList();
+        _updateSpots(); // cập nhật lại spots từ toàn bộ logs
       } else {
         // Áp dụng filter mới
         selectedFilter = filter;
@@ -209,11 +198,11 @@ class _HeartPageState extends State<heart> {
           case "Week":
             startDate = now.subtract(Duration(days: 7));
             break;
-          case "Months":
-            startDate = DateTime(now.year, now.month - 1, now.day);
+          case "1Hour":
+            startDate = now.subtract(Duration(hours: 1));
             break;
-          case "Years":
-            startDate = DateTime(now.year - 1, now.month, now.day);
+          case "2Hours":
+            startDate = now.subtract(Duration(hours: 2));
             break;
           default:
             startDate = DateTime(2000);
@@ -222,10 +211,10 @@ class _HeartPageState extends State<heart> {
         List<FlSpot> newSpots = [];
         List<DateTime> newDates = [];
 
-        for (int i = 0; i < dates.length; i++) {
-          if (dates[i].isAfter(startDate)) {
-            newSpots.add(FlSpot(newDates.length.toDouble(), values[i]));
-            newDates.add(dates[i]);
+        for (int i = 0; i < logs.length; i++) {
+          if (logs[i].timestamp.isAfter(startDate)) {
+            newSpots.add(FlSpot(newDates.length.toDouble(), logs[i].heartRate));
+            newDates.add(logs[i].timestamp);
           }
         }
 
@@ -234,7 +223,8 @@ class _HeartPageState extends State<heart> {
       }
     });
   }
-}
-String _formatDate(DateTime date) {
-  return "${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}";
+
+  String _formatDate(DateTime date) {
+    return "${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}";
+  }
 }

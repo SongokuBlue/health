@@ -5,11 +5,12 @@ class LineChartWidget extends StatelessWidget {
   final List<DateTime> dates;
   final List<FlSpot> spots;
   final Color chartColor;
+
   const LineChartWidget({
     super.key,
     required this.dates,
     required this.spots,
-    required this.chartColor
+    required this.chartColor,
   });
 
   @override
@@ -25,16 +26,9 @@ class LineChartWidget extends StatelessWidget {
           maxY: 200,
           gridData: FlGridData(
             show: true,
-            drawVerticalLine: true,
-            verticalInterval: 1,
+            drawVerticalLine: false, // bỏ grid dọc để đỡ rối
             drawHorizontalLine: true,
             getDrawingHorizontalLine: (value) {
-              return FlLine(
-                color: chartColor.withOpacity(0.3),
-                strokeWidth: 1,
-              );
-            },
-            getDrawingVerticalLine: (value) {
               return FlLine(
                 color: chartColor.withOpacity(0.3),
                 strokeWidth: 1,
@@ -52,9 +46,31 @@ class LineChartWidget extends StatelessWidget {
                   if (index < 0 || index >= dates.length) {
                     return const SizedBox.shrink();
                   }
-                  final date = dates[index];
-                  return Text('${date.day}/${date.month}',
-                      style: const TextStyle(fontSize: 10));
+
+                  // Chỉ hiện label khi ngày thay đổi hoặc là điểm đầu tiên
+                  bool showLabel = false;
+                  if (index == 0) {
+                    showLabel = true;
+                  } else {
+                    DateTime prevDate = dates[index - 1];
+                    DateTime currDate = dates[index];
+                    if (currDate.day != prevDate.day ||
+                        currDate.month != prevDate.month ||
+                        currDate.year != prevDate.year) {
+                      showLabel = true;
+                    }
+                  }
+
+                  if (showLabel) {
+                    final date = dates[index];
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 5),
+                      child: Text('${date.day}/${date.month}',
+                          style: const TextStyle(fontSize: 10)),
+                    );
+                  } else {
+                    return const SizedBox.shrink();
+                  }
                 },
               ),
             ),
@@ -86,8 +102,29 @@ class LineChartWidget extends StatelessWidget {
               dotData: FlDotData(show: true),
               color: chartColor,
               barWidth: 3,
-            )
+            ),
           ],
+          lineTouchData: LineTouchData(
+            touchTooltipData: LineTouchTooltipData(
+                tooltipBorderRadius: BorderRadius.circular(8),
+              getTooltipItems: (List<LineBarSpot> touchedSpots) {
+                return touchedSpots.map((spot) {
+                  int index = spot.x.toInt();
+                  if (index < 0 || index >= dates.length) {
+                    return null;
+                  }
+                  DateTime date = dates[index];
+                  String dateStr = "${date.day}/${date.month}/${date.year} "
+                      "${date.hour}:${date.minute.toString().padLeft(2, '0')}";
+
+                  return LineTooltipItem(
+                    "${spot.y.toStringAsFixed(1)} bpm\n$dateStr",
+                    const TextStyle(color: Colors.white, fontSize: 12),
+                  );
+                }).toList();
+              },
+            ),
+          ),
         ),
       ),
     );
