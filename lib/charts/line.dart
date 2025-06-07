@@ -5,12 +5,16 @@ class LineChartWidget extends StatelessWidget {
   final List<DateTime> dates;
   final List<FlSpot> spots;
   final Color chartColor;
+  final double y_axis;
+  final String yAxisUnit;
 
   const LineChartWidget({
     super.key,
     required this.dates,
     required this.spots,
     required this.chartColor,
+    required this.y_axis,
+    required this.yAxisUnit,
   });
 
   @override
@@ -23,11 +27,10 @@ class LineChartWidget extends StatelessWidget {
           minX: 0,
           maxX: (dates.length - 1).toDouble(),
           minY: 0,
-          maxY: 200,
+          maxY: y_axis,
           gridData: FlGridData(
             show: true,
-            drawVerticalLine: true, // bỏ grid dọc để đỡ rối
-            verticalInterval: 5,
+            drawVerticalLine: false, // bỏ grid dọc để đỡ rối
             drawHorizontalLine: true,
             getDrawingHorizontalLine: (value) {
               return FlLine(
@@ -119,7 +122,7 @@ class LineChartWidget extends StatelessWidget {
                       "${date.hour}:${date.minute.toString().padLeft(2, '0')}";
 
                   return LineTooltipItem(
-                    "${spot.y.toStringAsFixed(1)} bpm\n$dateStr",
+                    "${spot.y.toStringAsFixed(1)}  $yAxisUnit \n$dateStr",
                     const TextStyle(color: Colors.white, fontSize: 12),
                   );
                 }).toList();

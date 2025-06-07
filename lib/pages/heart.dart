@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-
+import 'package:omni_datetime_picker/omni_datetime_picker.dart';
 import 'package:health/charts/line.dart';
 import 'package:health/bar/drawer.dart';
 import 'package:health/services/firebase_data.dart';
@@ -94,7 +94,7 @@ class _HeartPageState extends State<HeartPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("Last Measured result",
+                  Text("Last Measured",
                       style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                   Text("${logs.isNotEmpty ? logs.last.heartRate.toStringAsFixed(1) : '0.0'} bpm",
                       style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
@@ -107,8 +107,7 @@ class _HeartPageState extends State<HeartPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _buildFilterButton("Days"),
-                _buildFilterButton("Week"),
+                _buildCustomDateRangeButton(),
                 _buildFilterButton("1Hour"),
                 _buildFilterButton("2Hours"),
               ],
@@ -116,7 +115,7 @@ class _HeartPageState extends State<HeartPage> {
             SizedBox(height: 32),
             // Biểu đồ trực tiếp không container
             LineChartWidget(
-                dates: filterdates, spots: spots, chartColor: Colors.red),
+                dates: filterdates, spots: spots, chartColor: Colors.red, y_axis: 150.0,yAxisUnit: "bpm"),
             SizedBox(height: 32),
             Text("Last updated: ${_lastUpdated.toString()}"),
             Container(
@@ -192,12 +191,6 @@ class _HeartPageState extends State<HeartPage> {
         DateTime startDate;
 
         switch (filter) {
-          case "Days":
-            startDate = now.subtract(Duration(days: 1));
-            break;
-          case "Week":
-            startDate = now.subtract(Duration(days: 7));
-            break;
           case "1Hour":
             startDate = now.subtract(Duration(hours: 1));
             break;
@@ -230,6 +223,70 @@ class _HeartPageState extends State<HeartPage> {
         "${date.year} "
         "${date.hour.toString().padLeft(2, '0')}:"
         "${date.minute.toString().padLeft(2, '0')}";
+  }
+
+  Widget _buildCustomDateRangeButton() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 6),
+      child: ElevatedButton(
+        child: Text("Custom Range"),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: selectedFilter == "Custom" ? Colors.purple : Colors.white,
+          foregroundColor: selectedFilter == "Custom" ? Colors.white : Colors.purple,
+          shape: StadiumBorder(),
+          elevation: 2,
+        ),
+        onPressed: () async { //on press này có sẵn rồi
+          List<DateTime>? dateTimeList = await showOmniDateTimeRangePicker(
+            context: context,
+            startInitialDate: DateTime.now().subtract(Duration(hours: 1)),
+            startFirstDate: DateTime(2000),
+            startLastDate: DateTime.now(),
+            endInitialDate: DateTime.now(),
+            endFirstDate: DateTime(2000),
+            endLastDate: DateTime.now(),
+            is24HourMode: true,
+            isShowSeconds: false,
+            minutesInterval: 1,
+            secondsInterval: 1,
+            borderRadius: BorderRadius.all(Radius.circular(16)),
+            constraints: BoxConstraints(maxWidth: 350, maxHeight: 650),
+            transitionBuilder: (context, anim1, anim2, child) {
+              return FadeTransition(
+                opacity: anim1.drive(
+                  Tween(begin: 0, end: 1),
+                ),
+                child: child,
+              );
+            },
+            transitionDuration: Duration(milliseconds: 200),
+            barrierDismissible: true,
+          );
+
+          if (dateTimeList != null && dateTimeList.length == 2) {
+            DateTime start = dateTimeList[0];
+            DateTime end = dateTimeList[1];
+
+            List<FlSpot> newSpots = [];
+            List<DateTime> newDates = [];
+
+            for (int i = 0; i < logs.length; i++) {
+              if (logs[i].timestamp.isAfter(start) &&
+                  logs[i].timestamp.isBefore(end)) {
+                newSpots.add(FlSpot(newDates.length.toDouble(), logs[i].heartRate));
+                newDates.add(logs[i].timestamp);
+              }
+            }
+
+            setState(() {
+              selectedFilter = "Custom";
+              spots = newSpots;
+              filterdates = newDates;
+            });
+          }
+        },
+      ),
+    );
   }
 
 }

@@ -14,7 +14,7 @@ class CustomDrawer extends StatelessWidget {
             child: Text('account'),
           ),
           ListTile(
-            title: const Text('Item 1'),
+            title: const Text('Profile'),
             onTap: () {
               // Update the state of the app.
               // ...
@@ -22,7 +22,7 @@ class CustomDrawer extends StatelessWidget {
             },
           ),
           ListTile(
-            title: const Text('Item 2'),
+            title: const Text('Log Out'),
             onTap: () {
               // Update the state of the app.
               // ...
