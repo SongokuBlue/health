@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 
-// import 'package:omni_datetime_picker/omni_datetime_picker.dart';
-// import 'package:health/charts/line.dart';
-// import 'package:health/bar/drawer.dart';
+import 'package:health/services/custom_range_button.dart';
+import 'package:health/charts/line.dart';
+import 'package:health/bar/drawer.dart';
 import 'package:health/services/firebase_data.dart';
 import 'package:percent_indicator/percent_indicator.dart';
-import 'package:health/bar/textfield.dart';
+
 
 final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 final Target_input =
@@ -20,13 +20,44 @@ class StepPage extends StatefulWidget {
 }
 
 class _StepPage extends State<StepPage> {
-  int currentStep = 7850;
+  DateTime _lastUpdated = DateTime.now(); // Lưu trữ thời gian cập nhật
+  String selectedFilter = ""; // Mặc định
+  List<DateTime> filterdates = [];
+  List<HealthLog> logs = []; // Danh sách lưu trữ logs từ Firebase
+  List<FlSpot> spots = [];
   int targetStep = int.tryParse(Target_input.text) ?? 10000;
   @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  // Load dữ liệu từ Firebase
+  void _loadData() async {
+    FirebaseService service = FirebaseService();
+    final data = await service.getDailyStepLogs();
+    print("Fetched data: $data");  // Kiểm tra xem dữ liệu có được lấy không
+    setState(() {
+      logs = data;
+      _updateSpots();
+      filterdates = data.map((log) => log.timestamp).toList();
+    });
+  }
+
+  // Cập nhật spots cho biểu đồ từ dữ liệu logs
+  void _updateSpots() {
+    spots = List.generate(
+      logs.length,
+          (index) => FlSpot(index.toDouble(), logs[index].stepCount.toDouble()),
+    );
+  }
   Widget build(BuildContext context) {
+    double currentStep = logs.isNotEmpty ? logs.last.stepCount.toDouble() : 0.0;
     double percent = currentStep / targetStep;
     final backgroundColor = Color(0xFFFDF4FF); // Màu nền app
     return Scaffold(
+      key: _scaffoldKey,
+      endDrawer: CustomDrawer(),
       appBar: AppBar(
         title: Row(
           mainAxisAlignment: MainAxisAlignment.start, // Căn giữa icon và text
@@ -44,10 +75,10 @@ class _StepPage extends State<StepPage> {
         actions: [
           IconButton(
             onPressed: () {
-              // setState(() {
-              //   _loadData(); // Tải lại dữ liệu từ Firebase khi nhấn refresh
-              //   _lastUpdated = DateTime.now(); // Cập nhật lại thời gian
-              // });
+              setState(() {
+                _loadData(); // Tải lại dữ liệu từ Firebase khi nhấn refresh
+                _lastUpdated = DateTime.now(); // Cập nhật lại thời gian
+              });
             },
             icon: const Icon(Icons.refresh),
           ),
@@ -73,7 +104,7 @@ class _StepPage extends State<StepPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    '$currentStep',
+                    '${logs.isNotEmpty ? logs.last.stepCount.toStringAsFixed(1) : '0.0'}',
                     style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
                   ),
                   Text('Steps', style: TextStyle(fontSize: 18)),
@@ -103,6 +134,51 @@ class _StepPage extends State<StepPage> {
                   ),
                 ),
               ],
+            ),
+            // Nút chọn thời gian
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CustomRangeButton(
+                  selectedFilter: selectedFilter,
+                  logs: logs,
+                  onFilterChanged: (filter) {
+                    setState(() {
+                      selectedFilter = filter;
+                    });
+                  },
+                  onCustomRangeApplied: (newSpots, newDates) {
+                    setState(() {
+                      spots = newSpots;
+                      filterdates = newDates;
+                    });
+                  },
+                ),
+                _buildFilterButton("Weekly"),
+                _buildFilterButton("2Weeks"),
+              ],
+            ),
+            SizedBox(height: 20),
+            // Biểu đồ trực tiếp không container
+            LineChartWidget(
+                dates: filterdates, spots: spots, chartColor: Colors.red, y_axis: targetStep.toDouble(),yAxisUnit: "steps"),
+            SizedBox(height: 20),
+            Text("Last updated: ${_lastUpdated.toString()}"),
+            Container(
+              margin: EdgeInsets.symmetric(horizontal: 24),
+              padding: EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.red[50],
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 4,
+                    offset: Offset(2, 2),
+                  ),
+                ],
+              ),
+
             ),
           ],
         ),
@@ -171,5 +247,63 @@ class _StepPage extends State<StepPage> {
         );
       },
     );
+  }
+  Widget _buildFilterButton(String label) {
+    final isSelected = selectedFilter == label;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 6),
+      child: ElevatedButton(
+        onPressed: () {
+          _filterData(label);
+        },
+        child: Text(label),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: isSelected ? Colors.purple : Colors.white,
+          foregroundColor: isSelected ? Colors.white : Colors.purple,
+          shape: StadiumBorder(),
+          elevation: 2,
+        ),
+      ),
+    );
+  }
+
+  void _filterData(String filter) {
+    setState(() {
+      if (selectedFilter == filter) {
+        // Nếu đang chọn filter đó => bấm lại lần nữa sẽ hủy chọn
+        selectedFilter = ""; // hoặc "All"
+        filterdates = logs.map((log) => log.timestamp).toList();
+        _updateSpots(); // cập nhật lại spots từ toàn bộ logs
+      } else {
+        // Áp dụng filter mới
+        selectedFilter = filter;
+        DateTime now = DateTime.now();
+        DateTime startDate;
+
+        switch (filter) {
+          case "Weekly":
+            startDate = now.subtract(Duration(days: 7));
+            break;
+          case "2Hours":
+            startDate = now.subtract(Duration(days: 14));
+            break;
+          default:
+            startDate = DateTime(2000);
+        }
+
+        List<FlSpot> newSpots = [];
+        List<DateTime> newDates = [];
+
+        for (int i = 0; i < logs.length; i++) {
+          if (logs[i].timestamp.isAfter(startDate)) {
+            newSpots.add(FlSpot(newDates.length.toDouble(), logs[i].stepCount.toDouble()));
+            newDates.add(logs[i].timestamp);
+          }
+        }
+
+        spots = newSpots;
+        filterdates = newDates;
+      }
+    });
   }
 }

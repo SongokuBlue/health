@@ -69,7 +69,6 @@ class FirebaseService {
         (group.map((e) => e.oxygenSaturation).reduce((a, b) => a + b) / group.length)
             .toStringAsFixed(1),
       );
-      int avgStep = (group.map((e) => e.stepCount).reduce((a, b) => a + b) / group.length).round();
 
       // Dùng timestamp đầu tiên trong nhóm (hoặc parse từ key)
       averagedLogs.add(
@@ -77,7 +76,7 @@ class FirebaseService {
           emergency: group.any((e) => e.emergency),
           heartRate: avgHeart,
           oxygenSaturation: avgOxy,
-          stepCount: avgStep,
+          stepCount: 0,
           timestamp: group.first.timestamp,
         ),
       );
@@ -87,6 +86,39 @@ class FirebaseService {
     averagedLogs.sort((a, b) => a.timestamp.compareTo(b.timestamp));
     return averagedLogs;
   }
+  Future<List<HealthLog>> getDailyStepLogs() async {
+    final logs = await fetchHealthLogs();
+
+    // Gom theo ngày dùng DateTime làm key thay vì string
+    Map<DateTime, List<HealthLog>> grouped = {};
+
+    for (var log in logs) {
+      final dateKey = DateTime(log.timestamp.year, log.timestamp.month, log.timestamp.day);
+      grouped.putIfAbsent(dateKey, () => []);
+      grouped[dateKey]!.add(log);
+    }
+
+    // Tổng hợp step per day
+    List<HealthLog> dailyLogs = [];
+
+    grouped.forEach((date, group) {
+      int totalStep = group.map((e) => e.stepCount).reduce((a, b) => a > b ? a : b);
+
+      dailyLogs.add(
+        HealthLog(
+          emergency: group.any((e) => e.emergency),
+          heartRate: 0,
+          oxygenSaturation: 0,
+          stepCount: totalStep,
+          timestamp: date,
+        ),
+      );
+    });
+
+    dailyLogs.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+    return dailyLogs;
+  }
+
 }
 
 
