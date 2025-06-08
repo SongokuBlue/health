@@ -1,15 +1,38 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:health/bar/textfield.dart';
-import '';
 
-class LoginPage extends StatelessWidget {
-  LoginPage({super.key});
 
-  final usernameController =
-      TextEditingController(); // lấy giá trị string dc nhập từ user
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+
+  final EmailController = TextEditingController(); // lấy giá trị string dc nhập từ user
   final passwordController = TextEditingController();
-
+  void signUserIn()async{
+    showDialog(context: context, builder: (context){
+      return Center(child: CircularProgressIndicator(),);
+    });
+    try {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+          email: EmailController.text,
+          password: passwordController.text,
+      );
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        print('No user found for that email.');
+      } else if (e.code == 'wrong-password') {
+        print('Wrong password provided for that user.');
+      }
+    }
+    Navigator.pop(context);
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,9 +58,9 @@ class LoginPage extends StatelessWidget {
               const SizedBox(height: 30),
               //login and password field
               CustomTextField(
-                label: 'Username',
+                label: 'Email',
                 obscureText: false,
-                controller: usernameController,
+                controller: EmailController,
               ), //username
               const SizedBox(height: 10),
               CustomTextField(
@@ -49,18 +72,16 @@ class LoginPage extends StatelessWidget {
 
 
               //log in button
-              Container(
-                padding: EdgeInsets.all(15),
-                margin: EdgeInsets.all(25),
-                decoration: BoxDecoration(
-                  color: Colors.blue,
-                  borderRadius: BorderRadius.circular(12),
+              ElevatedButton(
+                onPressed: signUserIn, // gọi hàm khi bấm
+                style: ElevatedButton.styleFrom(
+                  padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  backgroundColor: Colors.blue,
                 ),
-                child: Center(
-                  child: Text(
-                    "Log in",
-                    style: TextStyle(fontSize: 20, color: Colors.white),
-                  ),
+                child: Text(
+                  "Log in",
+                  style: TextStyle(fontSize: 20, color: Colors.white),
                 ),
               ),
               const SizedBox(height: 10),

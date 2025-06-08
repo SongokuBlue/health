@@ -4,6 +4,8 @@ import 'package:health/pages/login_page.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'package:health/pages/auth_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';  // Thêm dòng này
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // phải khởi tạo trc
   await Firebase.initializeApp(
@@ -26,7 +28,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return  MaterialApp(
         debugShowCheckedModeBanner: false,
-      home: HomePage()
+      home: AuthPage()
     );
   }
 }
