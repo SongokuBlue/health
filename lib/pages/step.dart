@@ -20,10 +20,9 @@ class StepPage extends StatefulWidget {
 }
 
 class _StepPage extends State<StepPage> {
-  @override
   int currentStep = 7850;
   int targetStep = int.tryParse(Target_input.text) ?? 10000;
-
+  @override
   Widget build(BuildContext context) {
     double percent = currentStep / targetStep;
     final backgroundColor = Color(0xFFFDF4FF); // Màu nền app
@@ -74,13 +73,13 @@ class _StepPage extends State<StepPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    '7850',
+                    '$currentStep',
                     style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
                   ),
                   Text('Steps', style: TextStyle(fontSize: 18)),
                   SizedBox(height: 8),
                   Text(
-                    '150 steps left',
+                    '${(targetStep - currentStep).clamp(0, targetStep)} steps left',
                     style: TextStyle(color: Colors.blue, fontSize: 18),
                   ),
                 ],
@@ -143,7 +142,7 @@ class _StepPage extends State<StepPage> {
                     context: context,
                     builder: (context) {
                       return AlertDialog(
-                        title: Text("Warning"),
+                        title: Text("Warning",style: TextStyle(fontWeight: FontWeight.bold)),
                         content: Text('Please enter a number greater than 0.'),
                         actions: [
                           TextButton(
@@ -155,10 +154,13 @@ class _StepPage extends State<StepPage> {
                     },
                   );
                 }
-                setState(() {
-                  targetStep = int.tryParse(Target_input.text) ?? 10000;
-                });
-                Navigator.pop(context);
+                else {
+                  // Input hợp lệ, cập nhật giá trị
+                  setState(() {
+                    targetStep = parsed;
+                  });
+                  Navigator.pop(context); // đóng dialog "Set Target"
+                }
               },
               child: Text('Save'),
             ),
