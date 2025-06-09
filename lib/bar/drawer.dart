@@ -18,7 +18,7 @@ class CustomDrawer extends StatelessWidget {
             child: Text('User Info',style: TextStyle(color: Colors.white,fontSize: 20),),
           ),
           ListTile(
-            title: const Text('Profile'),
+            title: const Text('Profile',style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold),),
             onTap: () {
               // Update the state of the app.
               // ...
@@ -29,13 +29,32 @@ class CustomDrawer extends StatelessWidget {
             },
           ),
           ListTile(
-            title: const Text('Log Out'),
+            title: const Text('Log Out',style: TextStyle(color: Colors.red,fontSize: 20,fontWeight: FontWeight.bold),),
             onTap: () {
-              SignOut();
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (context) => const AuthPage()),
-                    (Route<dynamic> route) => false,
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: Text("Warning", style: TextStyle(fontWeight: FontWeight.bold)),
+                  content: Text('Do you want to log out',style: TextStyle(fontSize: 15),),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text('Cancel'),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        SignOut();
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(builder: (context) => const AuthPage()),
+                              (Route<dynamic> route) => false,
+                        );
+                      },
+                      child: Text('Log out',style: TextStyle(color: Colors.red),),
+                    ),
+                  ],
+                ),
               );
+
             },
           ),
         ],

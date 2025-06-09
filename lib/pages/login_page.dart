@@ -20,6 +20,7 @@ class _LoginPageState extends State<LoginPage> {
     showDialog(
       context: context,
       barrierDismissible: false,
+      useRootNavigator: true, // thêm dòng này
       builder: (context) => const Center(child: CircularProgressIndicator()),
     );
 
@@ -29,11 +30,9 @@ class _LoginPageState extends State<LoginPage> {
         email: EmailController.text,
         password: passwordController.text,
       );
-
-       Navigator.pop(context); // Đóng loading dialog
-      // TODO: điều hướng sang trang khác nếu cần
+      Navigator.pop(context); // Đóng loading dialog
     } on FirebaseAuthException catch (e) {
-      if (mounted) Navigator.pop(context); // Đóng loading dialog
+       Navigator.pop(context); // Đóng loading dialog
 
       switch (e.code) {
         case 'invalid-credential':
