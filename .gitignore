@@ -11,7 +11,8 @@
 .svn/
 .swiftpm/
 migrate_working_dir/
-
+# Hprof files (memory dump)
+*.hprof
 # IntelliJ related
 *.iml
 *.ipr
