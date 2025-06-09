@@ -12,7 +12,7 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   final User? user = FirebaseAuth.instance.currentUser; // lấy dữ liệu hiện tại của user đó
-
+  DateTime _lastUpdated = DateTime.now();
   bool isEditing = false;
 
   // Controllers để lưu trữ dữ liệu nhập
@@ -25,6 +25,7 @@ class _ProfilePageState extends State<ProfilePage> {
   String gender = "Male";
 
   void initState() {
+
     super.initState();
     _loadUserData();
   }
@@ -67,6 +68,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     }
 
                     setState(() {
+                      _lastUpdated = DateTime.now(); // Cập nhật lại thời gian
                       isEditing = false;
                     });
 
@@ -192,7 +194,10 @@ class _ProfilePageState extends State<ProfilePage> {
                 ],
               ),
             ),
+            SizedBox(height: 20),
+            Text("Last updated: ${_lastUpdated.toString()}"),
           ],
+
         ),
       ),
     );

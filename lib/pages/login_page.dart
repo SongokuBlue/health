@@ -5,7 +5,8 @@ import 'package:health/bar/textfield.dart';
 
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+  final VoidCallback onTap;
+  const LoginPage({super.key,required this.onTap});
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -16,6 +17,8 @@ class _LoginPageState extends State<LoginPage> {
   final EmailController = TextEditingController(); // lấy giá trị string dc nhập từ user
   final passwordController = TextEditingController();
   void signUserIn() async {
+    FocusScope.of(context).unfocus();
+    await Future.delayed(Duration(milliseconds: 300));
     // Mở loading dialog
     showDialog(
       context: context,
@@ -30,9 +33,9 @@ class _LoginPageState extends State<LoginPage> {
         email: EmailController.text,
         password: passwordController.text,
       );
-      Navigator.pop(context); // Đóng loading dialog
+      Navigator.of(context, rootNavigator: true).pop();
     } on FirebaseAuthException catch (e) {
-       Navigator.pop(context); // Đóng loading dialog
+      Navigator.of(context, rootNavigator: true).pop();
 
       switch (e.code) {
         case 'invalid-credential':
@@ -73,10 +76,10 @@ class _LoginPageState extends State<LoginPage> {
       resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: EdgeInsets.only(
-            bottom:
-                MediaQuery.of(context,).viewInsets.bottom, // tránh bị che bởi bàn phím
-          ),
+          // padding: EdgeInsets.only(
+          //   bottom:
+          //       MediaQuery.of(context,).viewInsets.bottom, // tránh bị che bởi bàn phím
+          // ),
           child: Column(
             children: [
               //icon
@@ -123,13 +126,17 @@ class _LoginPageState extends State<LoginPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("Don't you have an account?"),
+                  const Text("Don't you have an account?"),
                   const SizedBox(width: 10),
-                  Text(
-                    "Create an account",
-                    style: TextStyle(
-                      color: Colors.blue,
-                      fontWeight: FontWeight.bold,
+                  GestureDetector(
+                    onTap: widget.onTap, // khi bấm sẽ gọi togglePages
+                    child: Text(
+                      "Create an account",
+                      style: TextStyle(
+                        color: Colors.blue,
+                        fontWeight: FontWeight.bold,
+                        decoration: TextDecoration.underline, // thêm gạch chân cho rõ là link
+                      ),
                     ),
                   ),
                 ],

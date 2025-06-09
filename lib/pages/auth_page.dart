@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'package:health/home.dart';
+import 'package:health/pages/login_or_register.dart';
 import 'package:health/pages/login_page.dart';
 class AuthPage extends StatelessWidget {
   const AuthPage({super.key});
@@ -18,7 +19,7 @@ class AuthPage extends StatelessWidget {
           }
           // ❌ Nếu chưa login => vào LoginPage
           else {
-            return LoginPage();
+            return LoginOrRegister();
           }
         },
       ),
