@@ -18,10 +18,17 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          "Profile",
-          style: Theme.of(context).textTheme.headlineSmall,
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.start, // Căn giữa icon và text
+          children: [
+            Text("Profile", style: TextStyle(fontWeight: FontWeight.bold)),
+
+            SizedBox(width: 10),
+
+            Icon(LineAwesomeIcons.user_check_solid, color: Colors.blueAccent),
+          ],
         ),
+
       ),
       body: SingleChildScrollView(
         child: Column(
