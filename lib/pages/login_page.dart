@@ -15,24 +15,59 @@ class _LoginPageState extends State<LoginPage> {
 
   final EmailController = TextEditingController(); // lấy giá trị string dc nhập từ user
   final passwordController = TextEditingController();
-  void signUserIn()async{
-    showDialog(context: context, builder: (context){
-      return Center(child: CircularProgressIndicator(),);
-    });
+  void signUserIn() async {
+    // Mở loading dialog
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(child: CircularProgressIndicator()),
+    );
+
     try {
+      // Gọi Firebase Auth
       await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: EmailController.text,
-          password: passwordController.text,
+        email: EmailController.text,
+        password: passwordController.text,
       );
+
+       Navigator.pop(context); // Đóng loading dialog
+      // TODO: điều hướng sang trang khác nếu cần
     } on FirebaseAuthException catch (e) {
-      if (e.code == 'user-not-found') {
-        print('No user found for that email.');
-      } else if (e.code == 'wrong-password') {
-        print('Wrong password provided for that user.');
+      if (mounted) Navigator.pop(context); // Đóng loading dialog
+
+      switch (e.code) {
+        case 'invalid-credential':
+          _showErrorDialog("Wrong email or password");
+          break;
+        case 'channel-error':
+          _showErrorDialog("Please enter full password and email");
+          break;
+        case 'too-many-requests':
+          _showErrorDialog("login failed many times ,please try again later ");
+          break;
+        default:
+          _showErrorDialog("there is error please try again.");
+          debugPrint("FirebaseAuth error: ${e.code}");
       }
     }
-    Navigator.pop(context);
   }
+  void _showErrorDialog(String message) {
+    if (!mounted) return;
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Error login"),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("OK"),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
