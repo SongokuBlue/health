@@ -130,7 +130,7 @@ class _HeartPageState extends State<HeartPage> {
             SizedBox(height: 32),
             // Biểu đồ trực tiếp không container
             LineChartWidget(
-                dates: filterdates, spots: spots, chartColor: Colors.red, y_axis: 150.0,yAxisUnit: "bpm"),
+                dates: filterdates, spots: spots, chartColor: Colors.red, y_axis: 150.0,yAxisUnit: "bpm",yaxisintervals: 10,),
             SizedBox(height: 32),
             Text("Last updated: ${_lastUpdated.toString()}"),
             Container(

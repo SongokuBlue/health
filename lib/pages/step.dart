@@ -91,7 +91,8 @@ class _StepPage extends State<StepPage> {
           ),
         ],
       ),
-      body: Align(
+      body:SingleChildScrollView(
+      child: Align(
         alignment: Alignment.topCenter,
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -156,14 +157,18 @@ class _StepPage extends State<StepPage> {
               dates: filterdates,
               spots: spots,
               chartColor: Colors.red,
-              y_axis: targetStep.toDouble(),
+              y_axis: targetStep.toDouble() >10000  ? targetStep.toDouble() : 10000,
               yAxisUnit: "steps",
+              yaxisintervals: 1000,
+              showGoalLine: true, // Bật goal line
+              goalValue: targetStep.toDouble(), // Giá trị mục tiêu
             ),
             SizedBox(height: 20),
             Text("Last updated: ${_lastUpdated.toString()}"),
           ],
         ),
       ),
+    ),
     );
   }
 

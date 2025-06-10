@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 
-class LineChartWidget extends StatelessWidget {
+class LineChartWidget extends StatefulWidget {
   final List<DateTime> dates;
   final List<FlSpot> spots;
   final Color chartColor;
   final double y_axis;
   final String yAxisUnit;
+  final bool showGoalLine; // Thêm dòng này
+  final double? goalValue; // Thêm dòng này (có thể null)
+  final double yaxisintervals;
 
   const LineChartWidget({
     super.key,
@@ -15,26 +18,74 @@ class LineChartWidget extends StatelessWidget {
     required this.chartColor,
     required this.y_axis,
     required this.yAxisUnit,
+    required this.yaxisintervals,
+    this.showGoalLine = false, // Mặc định là false
+    this.goalValue, // Không bắt buộc
   });
+
+  @override
+  _LineChartWidgetState createState() => _LineChartWidgetState();
+}
+
+class _LineChartWidgetState extends State<LineChartWidget> {
+  bool isLoading = true; // Biến để kiểm tra trạng thái tải dữ liệu
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  // Giả lập quá trình tải dữ liệu
+  Future<void> _loadData() async {
+    // Thực hiện tải dữ liệu tại đây (ví dụ: lấy dữ liệu từ API hoặc DB)
+    await Future.delayed(Duration(seconds: 2)); // Giả lập thời gian tải dữ liệu
+    setState(() {
+      isLoading = false; // Dữ liệu đã tải xong
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       height: 300,
       width: 350,
-      child: LineChart(
+      child: isLoading
+          ? Center(child: CircularProgressIndicator()) // Hiển thị loading indicator
+          : LineChart(
         LineChartData(
           minX: 0,
-          maxX: (dates.length - 1).toDouble(),
+          maxX: (widget.dates.length - 1).toDouble(),
           minY: 0,
-          maxY: y_axis,
+          maxY: widget.y_axis,
+          extraLinesData: widget.showGoalLine && widget.goalValue != null
+              ? ExtraLinesData(
+            horizontalLines: [
+              HorizontalLine(
+                y: widget.goalValue!,
+                color: Colors.green,
+                strokeWidth: 2,
+                dashArray: [5, 5],
+                label: HorizontalLineLabel(
+                  alignment: Alignment.centerRight,
+                  padding: EdgeInsets.only(right: 8),
+                  style: TextStyle(
+                    color: Colors.green,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  labelResolver: (value) => 'Goal: ${value}',
+                ),
+              ),
+            ],
+          )
+              : null, // Không hiển thị goal line nếu không cần
           gridData: FlGridData(
             show: true,
             drawVerticalLine: false, // bỏ grid dọc để đỡ rối
             drawHorizontalLine: true,
             getDrawingHorizontalLine: (value) {
               return FlLine(
-                color: chartColor.withOpacity(0.3),
+                color: widget.chartColor.withOpacity(0.3),
                 strokeWidth: 1,
               );
             },
@@ -43,11 +94,11 @@ class LineChartWidget extends StatelessWidget {
             bottomTitles: AxisTitles(
               sideTitles: SideTitles(
                 showTitles: true,
-                interval: 1,
+                interval: 5,
                 reservedSize: 30,
                 getTitlesWidget: (value, meta) {
                   int index = value.toInt();
-                  if (index < 0 || index >= dates.length) {
+                  if (index < 0 || index >= widget.dates.length) {
                     return const SizedBox.shrink();
                   }
 
@@ -56,8 +107,8 @@ class LineChartWidget extends StatelessWidget {
                   if (index == 0) {
                     showLabel = true;
                   } else {
-                    DateTime prevDate = dates[index - 1];
-                    DateTime currDate = dates[index];
+                    DateTime prevDate = widget.dates[index - 1];
+                    DateTime currDate = widget.dates[index];
                     if (currDate.day != prevDate.day ||
                         currDate.month != prevDate.month ||
                         currDate.year != prevDate.year) {
@@ -66,7 +117,7 @@ class LineChartWidget extends StatelessWidget {
                   }
 
                   if (showLabel) {
-                    final date = dates[index];
+                    final date = widget.dates[index];
                     return Padding(
                       padding: const EdgeInsets.only(top: 5),
                       child: Text('${date.day}/${date.month}',
@@ -81,7 +132,7 @@ class LineChartWidget extends StatelessWidget {
             leftTitles: AxisTitles(
               sideTitles: SideTitles(
                 showTitles: true,
-                interval: 1000,
+                interval: widget.yaxisintervals, // Truy cập từ widget và chuyển sang số nguyên
                 reservedSize: 40,
               ),
             ),
@@ -101,28 +152,28 @@ class LineChartWidget extends StatelessWidget {
           ),
           lineBarsData: [
             LineChartBarData(
-              spots: spots,
-              isCurved: true,
+              spots: widget.spots,
+              isCurved: false,
               dotData: FlDotData(show: true),
-              color: chartColor,
+              color: widget.chartColor,
               barWidth: 3,
             ),
           ],
           lineTouchData: LineTouchData(
             touchTooltipData: LineTouchTooltipData(
-                tooltipBorderRadius: BorderRadius.circular(8),
+              tooltipBorderRadius: BorderRadius.circular(8),
               getTooltipItems: (List<LineBarSpot> touchedSpots) {
                 return touchedSpots.map((spot) {
                   int index = spot.x.toInt();
-                  if (index < 0 || index >= dates.length) {
+                  if (index < 0 || index >= widget.dates.length) {
                     return null;
                   }
-                  DateTime date = dates[index];
+                  DateTime date = widget.dates[index];
                   String dateStr = "${date.day}/${date.month}/${date.year} "
                       "${date.hour}:${date.minute.toString().padLeft(2, '0')}";
 
                   return LineTooltipItem(
-                    "${spot.y.toStringAsFixed(1)}  $yAxisUnit \n$dateStr",
+                    "${spot.y.toStringAsFixed(1)}  ${widget.yAxisUnit} \n$dateStr",
                     const TextStyle(color: Colors.white, fontSize: 12),
                   );
                 }).toList();

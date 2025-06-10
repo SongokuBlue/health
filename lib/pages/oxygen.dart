@@ -129,7 +129,7 @@ class _OxyPageState extends State<oxygen> {
             SizedBox(height: 32),
             // Biểu đồ trực tiếp không container
             LineChartWidget(
-                dates: filterdates, spots: spots, chartColor: Colors.green, y_axis: 100.0,yAxisUnit: "%"),
+                dates: filterdates, spots: spots, chartColor: Colors.green, y_axis: 100.0,yAxisUnit: "%",yaxisintervals: 10,),
             SizedBox(height: 32),
             Text("Last updated: ${_lastUpdated.toString()}"),
             Container(
