@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:health/bar/textfield.dart';
-
+import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 
 class RegisterPage extends StatefulWidget {
   final VoidCallback onTap;
@@ -79,6 +79,7 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFFFEDF3), // ← thêm dòng này
       resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: SingleChildScrollView(
@@ -104,17 +105,20 @@ class _RegisterPageState extends State<RegisterPage> {
                 label: 'Email',
                 obscureText: false,
                 controller: EmailController,
+                prefixIcon: Icon(Icons.email),
               ), //username
               const SizedBox(height: 10),
               CustomTextField(
                 label: 'Password',
                 obscureText: true,
                 controller: passwordController,
+                prefixIcon: Icon(LineAwesomeIcons.lock_solid),
               ), //password
               CustomTextField(
                 label: 'Confirm Password',
                 obscureText: true,
                 controller: ConfirmpasswordController,
+                prefixIcon: Icon(LineAwesomeIcons.lock_solid),
               ), //password
               const SizedBox(height: 10),
 
@@ -125,11 +129,11 @@ class _RegisterPageState extends State<RegisterPage> {
                 style: ElevatedButton.styleFrom(
                   padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  backgroundColor: Colors.blue,
+                  backgroundColor:  const Color(0xFFF392A1),
                 ),
                 child: Text(
                   "Sign up",
-                  style: TextStyle(fontSize: 20, color: Colors.white),
+                  style: TextStyle(fontSize: 20, color:Colors.white),
                 ),
               ),
               const SizedBox(height: 10),
@@ -144,7 +148,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     child: Text(
                       "Login now",
                       style: TextStyle(
-                        color: Colors.blue,
+                        color: Colors.black,
                         fontWeight: FontWeight.bold,
                         decoration: TextDecoration.underline, // thêm gạch chân cho rõ là link
                       ),

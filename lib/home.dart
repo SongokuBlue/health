@@ -14,9 +14,10 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final double boxSize = 125; //chỉnh cho tất cả box
     return Scaffold(
+
       key: _scaffoldKey,
       endDrawer: CustomDrawer(),
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFFFEDF3), // ← thêm dòng này
       appBar: AppBar(
 
           actions: [

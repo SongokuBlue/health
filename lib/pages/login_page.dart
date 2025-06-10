@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:health/bar/textfield.dart';
-
+import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 
 class LoginPage extends StatefulWidget {
   final VoidCallback onTap;
@@ -73,6 +73,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFFFEDF3), // ← thêm dòng này
       resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: SingleChildScrollView(
@@ -98,12 +99,14 @@ class _LoginPageState extends State<LoginPage> {
                 label: 'Email',
                 obscureText: false,
                 controller: EmailController,
+                prefixIcon: Icon(Icons.email),
               ), //username
               const SizedBox(height: 10),
               CustomTextField(
                 label: 'Password',
                 obscureText: true,
                 controller: passwordController,
+                prefixIcon: Icon(LineAwesomeIcons.lock_solid),
               ), //password
               const SizedBox(height: 10),
 
@@ -114,7 +117,7 @@ class _LoginPageState extends State<LoginPage> {
                 style: ElevatedButton.styleFrom(
                   padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  backgroundColor: Colors.blue,
+                  backgroundColor:  const Color(0xFFF392A1),
                 ),
                 child: Text(
                   "Log in",
@@ -133,7 +136,7 @@ class _LoginPageState extends State<LoginPage> {
                     child: Text(
                       "Create an account",
                       style: TextStyle(
-                        color: Colors.blue,
+                        color: Colors.black,
                         fontWeight: FontWeight.bold,
                         decoration: TextDecoration.underline, // thêm gạch chân cho rõ là link
                       ),

@@ -57,7 +57,7 @@ class _StepPage extends State<StepPage> {
   Widget build(BuildContext context) {
     double currentStep = logs.isNotEmpty ? logs.last.stepCount.toDouble() : 0.0;
     double percent = currentStep / targetStep;
-    final backgroundColor = Color(0xFFFDF4FF);
+
 
     return Scaffold(
       key: _scaffoldKey,
@@ -70,7 +70,7 @@ class _StepPage extends State<StepPage> {
             SizedBox(width: 8),
           ],
         ),
-        backgroundColor: backgroundColor,
+        backgroundColor: const Color(0xFFFFEDF3), // ← thêm dòng này
         elevation: 0,
         foregroundColor: Colors.black,
         actions: [

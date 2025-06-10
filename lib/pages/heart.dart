@@ -63,7 +63,7 @@ class _HeartPageState extends State<HeartPage> {
             SizedBox(width: 8), // Khoảng cách giữa icon và text
           ],
         ),
-        backgroundColor: backgroundColor,
+        backgroundColor: const Color(0xFFFFEDF3),
         elevation: 0,
         foregroundColor: Colors.black,
         actions: [
